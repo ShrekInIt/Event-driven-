@@ -5,5 +5,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProcessedEventRepository extends JpaRepository<ProcessedEvent, Long> {
-    boolean existsByEventIdAndStatus(Long eventId, ProcessedEventStatus status);
 }

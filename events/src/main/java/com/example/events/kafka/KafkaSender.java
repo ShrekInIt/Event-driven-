@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class KafkaSender {
 
-    @Value("${outbox.topic}")
+    @Value("${topics.events}")
     private String topic;
 
     private final KafkaTemplate<String, String> kafkaTemplate;
