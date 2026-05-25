@@ -6,6 +6,7 @@ import com.example.events.outbox.enums.Status;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,6 +20,7 @@ public class OutboxMapper {
         outbox.setEventType(EventType.EVENT_CREATED);
         outbox.setPayload(toPayload(event));
         outbox.setStatus(Status.PENDING);
+        outbox.setTraceId(MDC.get("traceId"));
 
         return outbox;
     }

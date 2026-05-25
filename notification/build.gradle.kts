@@ -6,7 +6,7 @@ plugins {
 
 group = "com.example"
 version = "0.0.1-SNAPSHOT"
-description = "events"
+description = "notification"
 
 java {
     toolchain {
@@ -20,34 +20,23 @@ repositories {
 
 dependencies {
     implementation("io.github.resilience4j:resilience4j-spring-boot3:2.4.0")
-
+    implementation("io.github.resilience4j:resilience4j-ratelimiter:2.4.0")
+    implementation("io.github.resilience4j:resilience4j-annotations:2.4.0")
     implementation("org.springframework.boot:spring-boot-starter-aop")
 
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
-
-    implementation("org.springframework.boot:spring-boot-starter-web")
-
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
     implementation("org.flywaydb:flyway-core")
-
-    implementation("org.springframework.kafka:spring-kafka")
-    testImplementation("org.springframework.kafka:spring-kafka-test")
-
     implementation("org.flywaydb:flyway-database-postgresql")
-
-    implementation("org.mapstruct:mapstruct:1.6.3")
-    annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
-    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
-
-    implementation("javax.persistence:javax.persistence-api:2.2")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.kafka:spring-kafka")
 
     compileOnly("org.projectlombok:lombok")
-
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.projectlombok:lombok")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.kafka:spring-kafka-test")
     testCompileOnly("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")

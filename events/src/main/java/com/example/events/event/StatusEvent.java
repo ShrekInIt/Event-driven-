@@ -1,7 +1,7 @@
 package com.example.events.event;
 
 public enum StatusEvent {
-    SEND,
+    DELIVERED,
     FAILED,
     PENDING
 }

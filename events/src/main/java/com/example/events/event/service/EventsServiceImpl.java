@@ -1,7 +1,9 @@
 package com.example.events.event.service;
 
+import com.example.events.event.Events;
 import com.example.events.event.EventsMapper;
 import com.example.events.event.EventsRepository;
+import com.example.events.event.StatusEvent;
 import com.example.events.event.dto.EventRequest;
 import com.example.events.event.dto.EventResponse;
 import com.example.events.outbox.EventsOutboxService;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -46,8 +49,30 @@ public class EventsServiceImpl implements EventsService {
     @Override
     @Transactional(readOnly = true)
     public EventResponse getEventById(Long eventId) {
-        return eventsMapper.toEventResponse(eventsRepository.findById(eventId)
+        return eventsMapper.toEventResponse(getEvents(eventId));
+    }
+
+    @Override
+    @Transactional
+    public void markAsDelivered(Long eventId){
+        var event = getEvents(eventId);
+        event.setStatusEvent(StatusEvent.DELIVERED);
+        event.setUpdatedAt(LocalDateTime.now());
+        eventsRepository.save(event);
+    }
+
+    @Override
+    @Transactional
+    public void markAsFailed(Long eventId) {
+        var event = getEvents(eventId);
+        event.setStatusEvent(StatusEvent.FAILED);
+        event.setUpdatedAt(LocalDateTime.now());
+        eventsRepository.save(event);
+    }
+
+    private Events getEvents(Long eventId){
+        return eventsRepository.findById(eventId)
                 .orElseThrow(() ->
-                        new EntityNotFoundException("Event not found with id: " + eventId)));
+                        new EntityNotFoundException("Event not found with id: " + eventId));
     }
 }

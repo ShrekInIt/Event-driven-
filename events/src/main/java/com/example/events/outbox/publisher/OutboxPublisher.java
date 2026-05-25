@@ -151,7 +151,8 @@ public class OutboxPublisher {
     private OutboxMessage toOutboxMessage(EventsOutbox eventsOutbox) {
         return new OutboxMessage(
                 eventsOutbox.getId().toString(),
-                eventsOutbox.getPayload()
+                eventsOutbox.getPayload(),
+                eventsOutbox.getTraceId()
         );
     }
 }

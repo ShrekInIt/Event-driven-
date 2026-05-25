@@ -28,4 +28,18 @@ public interface EventsService {
      * @return EventResponse - Полученное событие по id
      */
     EventResponse getEventById(Long eventId);
+
+    /**
+     * Обновление статуса события на DELIVERED
+     *
+     * @param eventId - id события для обновления статуса
+     */
+    void markAsDelivered(Long eventId);
+
+    /**
+     * Обновление статуса события на FAILED
+     *
+     * @param eventId - id события для обновления статуса
+     */
+    void markAsFailed(Long eventId);
 }

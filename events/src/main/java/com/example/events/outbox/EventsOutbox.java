@@ -50,6 +50,9 @@ public class EventsOutbox {
     @Column(name = "last_error")
     private String last_error;
 
+    @Column(name = "trace_id")
+    private String traceId;
+
     @Column(name = "processing_started_at")
     private LocalDateTime processingStartedAt;
 
