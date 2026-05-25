@@ -1,4 +1,4 @@
-Проект	3.	Event-driven	уведомления
+Event-driven	уведомления
 ▪ Spring Boot + Kafka + PostgreSQL
 ▪ Consumer с идемпотентной обработкой (processed_events)
 ▪ DLQ для failed messages + retry topic
