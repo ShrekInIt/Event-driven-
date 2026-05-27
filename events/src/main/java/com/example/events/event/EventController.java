@@ -3,6 +3,7 @@ package com.example.events.event;
 import com.example.events.event.dto.EventRequest;
 import com.example.events.event.dto.EventResponse;
 import com.example.events.event.service.EventsService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class EventController {
 
     @PostMapping("/send")
     public ResponseEntity<EventResponse> generateEvents(
-            @RequestBody EventRequest request
+            @RequestBody @Valid EventRequest request
     ) {
         log.info("Received event request: {}", request);
         EventResponse response = eventService.sendMessage(request);
