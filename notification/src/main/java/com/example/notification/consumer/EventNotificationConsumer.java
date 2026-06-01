@@ -1,6 +1,7 @@
 package com.example.notification.consumer;
 
 import com.example.notification.event.EventCreatedMessage;
+import com.example.notification.processed.ProcessingDecision;
 import com.example.notification.processed.ProcessedEventService;
 import com.example.notification.service.NotificationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,10 +46,16 @@ public class EventNotificationConsumer {
                     eventMessage.createdAt()
             );
 
-            if (!processedEventService.tryStartProcessing(eventMessage.eventId())) {
+            ProcessingDecision processingDecision = processedEventService.tryStartProcessing(eventMessage.eventId());
+            if (processingDecision == ProcessingDecision.ALREADY_PROCESSED) {
                 log.info("Duplicate event received. eventId={}", eventMessage.eventId());
                 acknowledgment.acknowledge();
                 return;
+            }
+            if (processingDecision == ProcessingDecision.IN_PROGRESS) {
+                throw new IllegalStateException(
+                        "Event is already being processed. eventId=" + eventMessage.eventId()
+                );
             }
 
             try {

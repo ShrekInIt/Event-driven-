@@ -1,4 +1,4 @@
-package com.example.notification.consumer;
+package com.example.events.result;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -8,23 +8,24 @@ import org.springframework.kafka.retrytopic.RetryTopicConfiguration;
 import org.springframework.kafka.retrytopic.RetryTopicConfigurationBuilder;
 
 @Configuration
-public class KafkaConsumerConfig {
-    @Value("${topics.events}")
-    private String eventsTopic;
+public class ResultKafkaConsumerConfig {
 
-    @Value("${topics.events-retry-suffix}")
+    @Value("${topics.results}")
+    private String resultsTopic;
+
+    @Value("${topics.results-retry-suffix}")
     private String retryTopicSuffix;
 
-    @Value("${topics.events-dlq-suffix}")
+    @Value("${topics.results-dlq-suffix}")
     private String dlqTopicSuffix;
 
     @Bean
-    public RetryTopicConfiguration eventsRetryTopicConfiguration(
+    public RetryTopicConfiguration resultsRetryTopicConfiguration(
             KafkaTemplate<String, String> kafkaTemplate
     ) {
         return RetryTopicConfigurationBuilder
                 .newInstance()
-                .includeTopic(eventsTopic)
+                .includeTopic(resultsTopic)
                 .fixedBackOff(1000L)
                 .maxAttempts(4)
                 .useSingleTopicForSameIntervals()

@@ -2,10 +2,11 @@ package com.example.notification.processed;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,43 +15,28 @@ public class ProcessedEventService {
 
     private final ProcessedEventRepository processedEventRepository;
 
-    public boolean tryStartProcessing(Long eventId){
-        Optional<ProcessedEvent> existingEvent = processedEventRepository.findById(eventId);
+    @Value("${processed-events.processing-timeout-seconds:30}")
+    private long processingTimeoutSeconds;
 
-        if (existingEvent.isEmpty()){
-            ProcessedEvent event = new ProcessedEvent();
-            event.setEventId(eventId);
-            event.setStatus(ProcessedEventStatus.PROCESSING);
-            event.setProcessedAt(LocalDateTime.now());
-            processedEventRepository.save(event);
-            return true;
+    @Transactional
+    public ProcessingDecision tryStartProcessing(Long eventId){
+        if (processedEventRepository.insertProcessingIfAbsent(eventId) == 1) {
+            return ProcessingDecision.CLAIMED;
         }
 
-        ProcessedEvent event = existingEvent.get();
-
-
-        switch (event.getStatus()){
-            case PROCESSED -> {
-                log.info("Event with id {} has already been processed", eventId);
-                return false;
-            }
-            case PROCESSING -> {
-                log.info("Event with id {} is currently being processed by another instance", eventId);
-                return false;
-            }
-            case FAILED -> {
-                log.info("Event with id {} has previously failed processing. Retrying...", eventId);
-                event.setStatus(ProcessedEventStatus.PROCESSING);
-                event.setErrorMessage(null);
-                event.setProcessedAt(LocalDateTime.now());
-                processedEventRepository.save(event);
-                return true;
-            }
+        LocalDateTime staleBefore = LocalDateTime.now().minusSeconds(processingTimeoutSeconds);
+        if (processedEventRepository.restartFailedOrStaleProcessing(eventId, staleBefore) == 1) {
+            log.info("Event with id {} was failed or stale. Retrying...", eventId);
+            return ProcessingDecision.CLAIMED;
         }
 
-        return false;
+        return processedEventRepository.findById(eventId)
+                .filter(event -> event.getStatus() == ProcessedEventStatus.PROCESSED)
+                .map(event -> ProcessingDecision.ALREADY_PROCESSED)
+                .orElse(ProcessingDecision.IN_PROGRESS);
     }
 
+    @Transactional
     public void markAsProcessed(Long eventId){
         ProcessedEvent event = getProcessedEvent(eventId);
         event.setStatus(ProcessedEventStatus.PROCESSED);
@@ -59,6 +45,7 @@ public class ProcessedEventService {
         log.info("Marked event with id {} as processed", eventId);
     }
 
+    @Transactional
     public void markAsFailed(Long eventId, String errorMessage){
         ProcessedEvent event = getProcessedEvent(eventId);
         event.setStatus(ProcessedEventStatus.FAILED);

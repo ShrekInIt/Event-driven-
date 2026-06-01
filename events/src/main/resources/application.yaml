@@ -51,8 +51,11 @@ outbox:
 
 topics:
   events: events
-  events-dlq: events.dlq
+  events-retry-suffix: .retry
+  events-dlq-suffix: .dlq
   results: notification-results
+  results-retry-suffix: .retry
+  results-dlq-suffix: .dlq
 
 resilience4j:
   circuitbreaker:

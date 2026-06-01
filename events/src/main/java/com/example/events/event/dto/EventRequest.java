@@ -1,8 +1,8 @@
 package com.example.events.event.dto;
 
-import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotBlank;
 
 public record EventRequest(
-        @Nullable
+        @NotBlank
         String text
 ) {}
